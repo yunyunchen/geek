@@ -1,7 +1,7 @@
 package router
 
 import (
-	v1 "geek/04/api/v1"
+	"geek/04/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,8 +12,8 @@ func InitRouter() *gin.Engine {
 	vg1 := router.Group("/v1")
 	{
 		// 在v1这个分组下，注册路由
-		vg1.GET("/user/:id", v1.GetUser)
-		vg1.POST("/user/:id", v1.PostUser)
+		vg1.GET("/user/:id", service.GetUserHttp)
+		vg1.POST("/user/:id", service.PostUserHttp)
 	}
 
 	return router

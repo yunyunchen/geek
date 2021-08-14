@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"geek/04/api/v1/router"
+	v1 "geek/04/api/v1"
 	"golang.org/x/sync/errgroup"
 	"log"
 	"net/http"
@@ -12,6 +12,8 @@ import (
 )
 
 func main() {
+
+	//InitializeAllInstance()
 	ctx, cancel := context.WithCancel(context.Background())
 	g, errCtx := errgroup.WithContext(ctx)
 
@@ -19,7 +21,7 @@ func main() {
 	/*mux := http.NewServeMux()
 	mux.HandleFunc("/hello", helloServer)*/
 
-	rh := router.InitRouter()
+	rh := v1.InitRouter()
 	srv := &http.Server{
 		Addr:    "0.0.0.0:8000",
 		Handler: rh,
