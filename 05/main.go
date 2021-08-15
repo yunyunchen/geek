@@ -8,25 +8,27 @@ import (
 
 // SlidingWindowLimiter 滑动窗口计数器限流
 type SlidingWindowLimiter struct {
-	Interval    int64       // 总计数时间，*1000，转换为豪秒
-	LastTime    int64       // 上一个窗口时间,time.Now().UnixNano()
-	Lck         *sync.Mutex // 锁
-	WinCount    []int64     // 窗口中请求当前数量
-	TicketSize  int64       // 窗口最大容量
-	TicketCount int64       // 窗口个数
-	CurIndex    int64       // 目前使用的窗口下标
+	//Interval    int64       // 总计数时间，*1000，转换为豪秒
+	LastTime       int64       // 上一个窗口时间,time.Now().UnixNano()
+	Lck            *sync.Mutex // 锁
+	WinCount       []int64     // 窗口中请求当前数量
+	TicketSize     int64       // 窗口最大容量
+	TicketCount    int64       // 窗口个数
+	EachTicketTime int64       // 一个窗口的时间段
+	CurIndex       int64       // 目前使用的窗口下标
 }
 
 // NewSlidingWindowLimiter 初始化滑动窗口计数器限流
 func NewSlidingWindowLimiter(interval int64, ticketCount int64, ticketSize int64) *SlidingWindowLimiter {
 	return &SlidingWindowLimiter{
-		Interval:    interval * 1000,
-		LastTime:    time.Now().UnixNano(),
-		TicketSize:  ticketSize,
-		TicketCount: ticketCount,
-		WinCount:    make([]int64, ticketCount, ticketCount),
-		CurIndex:    0,
-		Lck:         new(sync.Mutex),
+		//Interval:    interval * 1000,
+		LastTime:       time.Now().UnixNano(),
+		TicketSize:     ticketSize,
+		TicketCount:    ticketCount,
+		WinCount:       make([]int64, ticketCount, ticketCount),
+		CurIndex:       0,
+		EachTicketTime: (interval * 1000) / ticketCount,
+		Lck:            new(sync.Mutex),
 	}
 }
 
@@ -34,13 +36,12 @@ func NewSlidingWindowLimiter(interval int64, ticketCount int64, ticketSize int64
 func (r *SlidingWindowLimiter) slidingCounterLimit() bool {
 	r.Lck.Lock()
 	defer r.Lck.Unlock()
-	// 一个窗口的时间段
-	eachTicketTime := r.Interval / r.TicketCount
+
 	// 当前时间
 	now := time.Now().UnixNano()
-	//fmt.Println(now/1e6,r.LastTime/1e6,now/1e6-r.LastTime/1e6,eachTicketTime)
+	//fmt.Println(now/1e6,r.LastTime/1e6,now/1e6-r.LastTime/1e6,r.EachTicketTime)
 	// 如果间隔时间超过一个窗口的时间 当前窗口置0 指向下一个窗口
-	if (now/1e6)-(r.LastTime/1e6) > eachTicketTime {
+	if (now/1e6)-(r.LastTime/1e6) > r.EachTicketTime {
 		r.WinCount[r.CurIndex] = 0
 		r.CurIndex = (r.CurIndex + 1) % r.TicketCount
 		r.LastTime = now
@@ -53,7 +54,7 @@ func (r *SlidingWindowLimiter) slidingCounterLimit() bool {
 		flag = true
 	}
 
-	fmt.Printf("当前时间段:%d,窗口中请求当前数量：%d,一个周期内窗口数据：%d", r.CurIndex, r.WinCount[r.CurIndex], r.WinCount)
+	fmt.Printf("当前时间段:%d,当前窗口请求数量：%d,一个周期内窗口数据：%d", r.CurIndex, r.WinCount[r.CurIndex], r.WinCount)
 
 	return flag
 }
