@@ -8,17 +8,14 @@ import (
 	"github.com/google/wire"
 )
 
-func InitializeAllInstance() *service.UserService {
-	//wire.Build(v1.NewUserInterface,UserSet)
-	panic(wire.Build(service.NewUserService,
-		biz.NewUserBiz,
-		data.NewUserRepo,
-	))
+func InitializeAllInstance() service.UserService {
+	panic(wire.Build(data.NewUserRepo, biz.NewUserBiz, service.NewUserService))
+	return service.UserService{}
 }
 
 /*var UserSet = wire.NewSet(
-	service.NewUserService,
-	biz.NewUserBiz,
 	data.NewUserRepo,
+	biz.NewUserBiz,
+	service.NewUserService,
 )
 */

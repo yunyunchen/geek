@@ -1,27 +1,36 @@
 package biz
 
 import (
-	"geek/04/internal/data"
 	"time"
 )
 
-type UserDo struct {
+/*type User struct {
 	Id    int64
 	Name  string
 	Email string
-}
-type UserBiz interface {
-	//QueryById(id string) (data.UserPo, error)
-	Insert(*data.UserPo) error
-	// todo
+}*/
+
+//var ProviderSet = wire.NewSet(NewUserBiz)
+
+type User struct {
+	Id        int64 `gorm:"primary_key"`
+	Username  string
+	Email     string
+	CreatedAt *time.Time
+	DeletedAt *time.Time
+	UpdatedAt *time.Time
 }
 
-type userBiz struct {
-	userRepo data.UserRepo
+type UserRepo interface {
+	InsertUser(user *User) error
 }
 
-func NewUserBiz(userRepo data.UserRepo) userBiz {
-	return userBiz{userRepo: userRepo}
+type UserUsecase struct {
+	repo UserRepo
+}
+
+func NewUserBiz(repo UserRepo) *UserUsecase {
+	return &UserUsecase{repo: repo}
 }
 
 //func (uc *UserUsecase) Get(ctx context.Context, id int64) (p *User, err error) {
@@ -32,8 +41,8 @@ func NewUserBiz(userRepo data.UserRepo) userBiz {
 //	return
 //}
 //
-func Insert(do *UserDo) error {
-	now := time.Now()
+func (uu UserUsecase) InsertUserBiz(do *User) error {
+	/*now := time.Now()
 	po := data.UserPo{
 		//Id: do.Id,
 		Username:  do.Name,
@@ -41,6 +50,7 @@ func Insert(do *UserDo) error {
 		CreatedAt: &now,
 		DeletedAt: nil,
 		UpdatedAt: &now,
-	}
-	return data.Insert(&po)
+	}*/
+	//return data.InsertUser(&po)
+	return uu.repo.InsertUser(do)
 }

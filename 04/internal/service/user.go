@@ -8,6 +8,8 @@ import (
 	"strconv"
 )
 
+//var ProviderSet = wire.NewSet(NewUserService)
+
 type GetArticleRequest struct {
 	Id string `json:"id,omitempty"`
 }
@@ -29,11 +31,11 @@ type UserReply struct {
 }
 
 type UserService struct {
-	userBiz biz.UserBiz
+	user *biz.UserUsecase
 }
 
-func NewUserService(userBiz biz.UserBiz) *UserService {
-	return &UserService{userBiz: userBiz}
+func NewUserService(user *biz.UserUsecase) *UserService {
+	return &UserService{user: user}
 }
 
 func GetUserHttp(c *gin.Context) {
@@ -60,9 +62,8 @@ func PostUserHttp(c *gin.Context) {
 		return
 	}
 
-	//var us UserService
-
-	err := biz.Insert(&biz.UserDo{Name: u.Name, Email: u.Email})
+	var us UserService
+	err := us.user.InsertUserBiz(&biz.User{Username: u.Name, Email: u.Email})
 	if err != nil {
 		c.String(http.StatusFound, "Query Error")
 		return

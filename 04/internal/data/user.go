@@ -2,27 +2,20 @@ package data
 
 import (
 	"fmt"
-	"time"
+	"geek/04/internal/biz"
 )
 
-type UserPo struct {
-	Id        int64 `gorm:"primary_key"`
-	Username  string
-	Email     string
-	CreatedAt *time.Time
-	DeletedAt *time.Time
-	UpdatedAt *time.Time
-}
+//var ProviderSet = wire.NewSet(NewUserRepo)
 
-type UserRepo interface {
-	Insert(*UserPo) error
-	//data *Data
-}
+//type UserRepo interface {
+//	InsertUser(*UserPo) error
+//	//data *Data
+//}
 
 type userRepo struct{}
 
-func NewUserRepo(repo UserRepo) userRepo {
-	return userRepo{}
+func NewUserRepo(repo userRepo) biz.UserRepo {
+	return nil
 }
 
 //
@@ -31,7 +24,7 @@ func NewUserRepo(repo UserRepo) userRepo {
 //	return &UserPo{},nil
 //}
 // (ur userRepo)
-func Insert(po *UserPo) error {
+func InsertUser(po *biz.User) error {
 	//todo
 	fmt.Println(po.Username + " / " + po.Email + " 持久化。")
 	return nil
