@@ -38,7 +38,14 @@ func NewUserService(user *biz.UserUsecase) *UserService {
 	return &UserService{user: user}
 }
 
-func GetUserHttp(c *gin.Context) {
+
+func (us *UserService) Routers(r gin.IRouter) {
+	g := r.Group("/user")
+	g.POST("/add", us.GetUserHttp)
+	g.GET("/get", us.PostUserHttp)
+}
+
+func (us *UserService)GetUserHttp(c *gin.Context) {
 	id_s := c.Param("id")
 
 	id, err := strconv.ParseInt(id_s, 10, 64)
@@ -52,7 +59,7 @@ func GetUserHttp(c *gin.Context) {
 	return
 }
 
-func PostUserHttp(c *gin.Context) {
+func (us *UserService)PostUserHttp(c *gin.Context) {
 	// 初始化user struct
 	u := InsertUserRequest{}
 	// 通过ShouldBind函数，将请求参数绑定到struct对象， 处理json请求代码是一样的。
@@ -62,8 +69,8 @@ func PostUserHttp(c *gin.Context) {
 		return
 	}
 
-	var us UserService
-	err := us.user.InsertUserBiz(&biz.User{Username: u.Name, Email: u.Email})
+	//var us UserService
+	err := us.user.InsertUserBiz(&biz.User{Name: u.Name, Email: u.Email})
 	if err != nil {
 		c.String(http.StatusFound, "Query Error")
 		return
